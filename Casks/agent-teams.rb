@@ -1,7 +1,7 @@
 cask "agent-teams" do
-  version "0.1.3"
-  sha256 arm:   "419a4a4c130aa689706ac6be03f6875a353383f6724c066904eacd6d841d37fc",
-         intel: "3861f4754ce189b4c463025963a13907fde246f735cd1b69741b3a4b9184757f"
+  version "0.1.5"
+  sha256 arm:   "0f021e6b9971410535406e174e70362a9e731ff9b35fadfabc8da34ab047788d",
+         intel: "b40483429a1a084d26619a9b0544f325b8ab8da22cc182771f635924aad0675b"
 
   url "https://github.com/ahwei/agent-teams-releases/releases/download/v#{version}/Agent-Teams-#{version}-#{Hardware::CPU.intel? ? "x64" : "arm64"}.dmg"
   name "Agent Teams"
@@ -11,20 +11,39 @@ cask "agent-teams" do
 
   app "Agent Teams.app"
 
+  # Ad-hoc-signed apps inherit com.apple.quarantine from the DMG download,
+  # which makes macOS Gatekeeper block first launch ("can't be opened because
+  # Apple cannot check it for malicious software"). Strip the attribute as
+  # part of the install so the user can just double-click from /Applications.
+  # Notes:
+  #   - Runs as the user, NOT sudo — /Applications is admin-writable, and the
+  #     app file ownership after the `app` stanza is the installing user.
+  #   - Safe to run if the attribute is already absent (xattr -d -r is a no-op
+  #     in that case; non-zero exit only if the path itself is missing).
+  #   - Once an Apple Developer ID + notarization story exists, this whole
+  #     block + the caveat below can be removed in one change.
+  postflight do
+    system_command "/usr/bin/xattr",
+                   args: ["-dr", "com.apple.quarantine", "#{appdir}/Agent Teams.app"],
+                   sudo: false
+  end
+
   zap trash: [
     "~/Library/Application Support/Agent Teams",
+    "~/Library/Application Support/ahwei-agent-teams",
     "~/Library/Preferences/dev.ahwei.agent-teams.plist",
     "~/Library/Saved Application State/dev.ahwei.agent-teams.savedState",
     "~/Library/Logs/Agent Teams",
+    "~/Library/Caches/dev.ahwei.agent-teams",
   ]
 
   caveats <<~EOS
     Agent Teams is ad-hoc signed (no Apple Developer ID) and is NOT notarized.
-    On first launch macOS Gatekeeper will block it. To allow:
+    The cask's postflight strips com.apple.quarantine automatically so first
+    launch from /Applications just works. If you ever see a Gatekeeper prompt
+    anyway (older cask, manual install), run:
 
       xattr -dr com.apple.quarantine "/Applications/Agent Teams.app"
-
-    Or: right-click the app in /Applications, choose Open, then confirm.
 
     Updates: this cask tracks new releases on `brew upgrade --cask agent-teams`.
     The app also self-updates via electron-updater (GitHub Releases) — both land
