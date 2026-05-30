@@ -1,7 +1,7 @@
 cask "agent-teams" do
-  version "0.1.11"
-  sha256 arm:   "07ee3f796c19cd07bb6c32cd46e49dc733c54b1ef6250e64ed2b5c9348e3f072",
-         intel: "cffca9f8dc3bc37fdc569d55897037f55829c78da7d06b82c1640ebe0a972742"
+  version "0.1.12"
+  sha256 arm:   "6cd403f46f86f87d0293785cc8deafa0d0aa50bef36968ff919e25abe403fbdc",
+         intel: "c81e1cef920eeafbf581d153bcae51bec10172f394d9831ba0abf64d5dea4256"
 
   url "https://github.com/ahwei/agent-teams-releases/releases/download/v#{version}/Agent-Teams-#{version}-#{Hardware::CPU.intel? ? "x64" : "arm64"}.dmg"
   name "Agent Teams"
