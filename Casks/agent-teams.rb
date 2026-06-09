@@ -1,12 +1,13 @@
 cask "agent-teams" do
-  version "0.2.0"
-  sha256 arm:   "d58a9223742cebd5ffc934d5b7074607d10fb4021f8a35d263cd15145ef82716",
-         intel: "07647dd91a4c924d7fee9557fd3ccb32e51433bd32b1de207c612603de441ae7"
+  version "0.3.0-rc.2"
+  sha256 arm:   "b12834d5eb0f8764ba3dd380eb8d8dd85a5b07593e24bbf972eeca1bc238adf2",
+         intel: "5fad50f9ecf3283ca8ea583199f8d3077ff3fd671a7c27652196a51659cf6d37"
 
   url "https://github.com/ahwei/agent-teams-releases/releases/download/v#{version}/Agent-Teams-#{version}-#{Hardware::CPU.intel? ? "x64" : "arm64"}.dmg"
   name "Agent Teams"
   desc "Local read-only dashboard for Claude Code sessions, agent teams, tokens/cost and tasks"
   homepage "https://github.com/ahwei/agent-teams-releases"
+
   auto_updates true
 
   app "Agent Teams.app"
@@ -45,9 +46,9 @@ cask "agent-teams" do
 
       xattr -dr com.apple.quarantine "/Applications/Agent Teams.app"
 
-    Updates: this cask tracks new releases on `brew upgrade --cask agent-teams`.
-    The app also self-updates via electron-updater (GitHub Releases) — both land
-    on the same versions; use whichever you prefer.
+    Updates: the app updates itself in place — on launch it checks for a newer
+    signature-verified release and offers a one-click update. You can also update
+    explicitly with `brew upgrade --cask agent-teams`.
 
     Release notes: https://github.com/ahwei/agent-teams-releases/releases/tag/v#{version}
   EOS
