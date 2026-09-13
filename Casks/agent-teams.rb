@@ -34,6 +34,9 @@ cask "agent-teams" do
         must_succeed: false
   end
 
+  # dev.ahwei.agent-teams is the Electron-era appId; the Tauri app uses the
+  # com.ahwei.agent-teams identifier. Both are listed so zap also cleans up
+  # after users who upgraded from the Electron builds.
   zap trash: [
     "~/Library/Application Support/Agent Teams",
     "~/Library/Application Support/ahwei-agent-teams",
@@ -41,6 +44,10 @@ cask "agent-teams" do
     "~/Library/Saved Application State/dev.ahwei.agent-teams.savedState",
     "~/Library/Logs/Agent Teams",
     "~/Library/Caches/dev.ahwei.agent-teams",
+    "~/Library/Caches/com.ahwei.agent-teams",
+    "~/Library/Preferences/com.ahwei.agent-teams.plist",
+    "~/Library/Saved Application State/com.ahwei.agent-teams.savedState",
+    "~/Library/WebKit/com.ahwei.agent-teams",
   ]
 
   caveats <<~EOS
