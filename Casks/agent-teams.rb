@@ -21,14 +21,22 @@ cask "agent-teams" do
   #     app file ownership after the `app` stanza is the installing user.
   #   - Safe to run if the attribute is already absent (xattr -d -r is a no-op
   #     in that case; non-zero exit only if the path itself is missing).
+  #   - must_succeed: false keeps the legacy behaviour: the old non-bang
+  #     system_command never aborted the install when xattr failed, whereas
+  #     a steps-block run aborts by default.
+  #   - {{appdir}} is an install-time token expanded by brew's step runner.
+  #     Ruby interpolation would be evaluated before the steps are serialised.
   #   - Once an Apple Developer ID + notarization story exists, this whole
   #     block + the caveat below can be removed in one change.
-  postflight do
-    system_command "/usr/bin/xattr",
-                   args: ["-dr", "com.apple.quarantine", "#{appdir}/Agent Teams.app"],
-                   sudo: false
+  postflight_steps do
+    run "/usr/bin/xattr",
+        args:         ["-dr", "com.apple.quarantine", "{{appdir}}/Agent Teams.app"],
+        must_succeed: false
   end
 
+  # dev.ahwei.agent-teams is the Electron-era appId; the Tauri app uses the
+  # com.ahwei.agent-teams identifier. Both are listed so zap also cleans up
+  # after users who upgraded from the Electron builds.
   zap trash: [
     "~/Library/Application Support/Agent Teams",
     "~/Library/Application Support/ahwei-agent-teams",
@@ -36,6 +44,10 @@ cask "agent-teams" do
     "~/Library/Saved Application State/dev.ahwei.agent-teams.savedState",
     "~/Library/Logs/Agent Teams",
     "~/Library/Caches/dev.ahwei.agent-teams",
+    "~/Library/Caches/com.ahwei.agent-teams",
+    "~/Library/Preferences/com.ahwei.agent-teams.plist",
+    "~/Library/Saved Application State/com.ahwei.agent-teams.savedState",
+    "~/Library/WebKit/com.ahwei.agent-teams",
   ]
 
   caveats <<~EOS
